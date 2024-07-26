@@ -7,7 +7,6 @@ import { cookies } from "next/headers";
 import { hash, verify } from "@node-rs/argon2";
 import { generateIdFromEntropySize } from "lucia";
 import { ZodError } from "zod";
-import { Prisma } from "@prisma/client";
 import { DefaultState } from "@/types/util";
 import { UserType } from "@/types/user";
 import { getErrorResponse } from "@/lib/utils";
@@ -74,7 +73,7 @@ export const saveUser = async (
         isSuccess: false,
       };
     }
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    if (error?.code === "P2002") {
       return {
         data: SignupSchema.parse(formData),
         message: "Email id already exist",
@@ -140,7 +139,7 @@ export const login = async (
       defaultValues: validData,
       response: rest,
       isSuccess: true,
-      message: "Login success",
+      message: "Login was successful",
     };
   } catch (error) {
     return getErrorResponse({

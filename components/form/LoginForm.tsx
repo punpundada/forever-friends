@@ -50,11 +50,16 @@ const LoginForm = () => {
     if (state.isSuccess) {
       router.push("/");
       toast("Success",{
-        description:"Login was successful",
+        description:state.message,
+        action:<Button variant={'outline'}>Close</Button>
+      })
+    }else{
+      toast("Error",{
+        description:state.message,
         action:<Button variant={'outline'}>Close</Button>
       })
     }
-  }, [state]);
+  }, [router, state]);
 
   return (
     <Card className="w-4/5">

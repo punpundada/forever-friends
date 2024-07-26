@@ -57,7 +57,7 @@ const SinupForm = () => {
     if (state.isSuccess) {
       router.push("/");
     }
-  }, [state]);
+  }, [router, state]);
 
   return (
     <Form {...form}>

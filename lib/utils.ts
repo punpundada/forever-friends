@@ -30,7 +30,7 @@ export function getErrorResponse<T, K>({
     };
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error?.code === "P2002") {
     return {
       defaultValues: schama.parse(formData) as T,
       message: uniqueFalureMsg ?? "Unique constraint failed",
