@@ -1,16 +1,15 @@
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
-import { PrismaClient } from "@prisma/client";
 import { Lucia, TimeSpan } from "lucia";
+import env from "./env";
+import prisma from "./prisma";
 
-const client = new PrismaClient();
-
-const adapter = new PrismaAdapter(client.session, client.user);
+const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
 	sessionExpiresIn: new TimeSpan(2, "w"), // 2 weeks
     getSessionAttributes: (attributes) => {
 		return {
-			ipCountry: attributes.ip_country
+			ipCountry: attributes
 		};
 	},
 	getUserAttributes: (attributes) => {
@@ -18,18 +17,14 @@ export const lucia = new Lucia(adapter, {
 	},
     sessionCookie:{
         name: "session",
-		expires: false, // session cookies have very long lifespan (2 years)
+		expires: false,
 		attributes: {
-			secure: true,
+			secure: env.NODE_ENV === 'production',
 			sameSite: "strict",
-			domain: "example.com"
 		}
-
     }
 
 });
-
-
 declare module "lucia" {
 	interface Register {
 		Lucia: typeof lucia;
@@ -37,19 +32,11 @@ declare module "lucia" {
         DatabaseUserAttributes: DatabaseUserAttributes;
 	}
 	interface DatabaseSessionAttributes {
-		ip_country: string;
 	}
     interface DatabaseUserAttributes {
         email: string;
-        id:string
+        id:string,
+		name:string
     }
     
 }
-
-
-// interface Session extends SessionAttributes {
-// 	id: string;
-// 	userId: string;
-// 	expiresAt: Date;
-// 	fresh: boolean;
-// }
