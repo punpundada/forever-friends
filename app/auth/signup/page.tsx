@@ -30,7 +30,7 @@ const SignupPage = () => {
             <SinupForm />
           </CardContent>
           <CardFooter>
-            <span>Already have an account <Link href={'/auth/login'} className="font-semibold hover:underline">Login</Link></span>
+            <span>Already have an account? <Link href={'/auth/login'} className="font-semibold hover:underline">Login</Link></span>
           </CardFooter>
         </Card>
       </div>

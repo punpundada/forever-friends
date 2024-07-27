@@ -3,8 +3,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ZodError, ZodObject } from "zod";
 import { Prisma } from "@prisma/client";
-
-
+import { FieldValues, SubmitHandler } from "react-hook-form";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -33,7 +32,10 @@ export function getErrorResponse<T, K>({
     };
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error?.code === "P2002") {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error?.code === "P2002"
+  ) {
     return {
       defaultValues: schama.parse(formData) as T,
       message: uniqueFalureMsg ?? "Unique constraint failed",
@@ -49,7 +51,15 @@ export function getErrorResponse<T, K>({
   };
 }
 
-export const emailOtpHTML = ({name,validFor,otp}:{name:string,validFor:string,otp:string})=>{
+export const emailOtpHTML = ({
+  name,
+  validFor,
+  otp,
+}: {
+  name: string;
+  validFor: string;
+  otp: string;
+}) => {
   return `
   <div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
 <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -68,7 +78,7 @@ export const emailOtpHTML = ({name,validFor,otp}:{name:string,validFor:string,ot
   </div>
 </div>
 </div>
-  `
-}
+  `;
+};
 
-
+export const REGEXP_ONLY_DIGITS = "^\d+$"

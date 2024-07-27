@@ -1,5 +1,7 @@
 "use server";
 import { lucia } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { UserType } from "@/types/user";
 import { cookies } from "next/headers";
 import React from "react";
 
@@ -21,5 +23,19 @@ const getUser = React.cache(async () => {
   }
   return user;
 });
+
+export const updateUser = React.cache(async (userId:string,user:Omit<UserType,"password">)=>{
+  return await prisma.user.update({
+    where:{
+      id:userId
+    },
+    data:{
+      email:user.email,
+      email_verified:user.email_verified,
+      name:user.name,
+    }
+  })
+})
+
 
 export default getUser;

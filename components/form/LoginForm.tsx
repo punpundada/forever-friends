@@ -1,13 +1,5 @@
 "use client";
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
 import { Form } from "../ui/form";
 import InputControl from "../form-control/InputControl";
 import { Button } from "../ui/button";
@@ -19,10 +11,12 @@ import { login } from "@/actions/authActions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+
 const defaultValues = {
   email: "",
   password: "",
 };
+
 const LoginForm = () => {
   const router = useRouter();
   const formRef = React.useRef<HTMLFormElement | null>(null);
@@ -35,7 +29,7 @@ const LoginForm = () => {
   });
 
   const form = useForm<LoginSchemaType>({
-    defaultValues,
+    defaultValues: { ...defaultValues, ...state.defaultValues },
     resolver: zodResolver(loginSchema),
     mode: "onChange",
   });
@@ -63,54 +57,38 @@ const LoginForm = () => {
   }, [router, state]);
 
   return (
-    <Card className="w-[90%] md:w-[80%]">
-      <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>
-          Login To <strong>Forever Friends</strong>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form
-            onSubmit={onSubmit}
-            className="space-y-4 md:space-x-2"
-            action={formAction}
-            ref={formRef}
-          >
-            <InputControl
-              name="email"
-              label="Email"
-              placeholder="example@gmail.com"
-              disabled={isPending}
-            />
-            <InputControl
-              name="password"
-              label="Password"
-              placeholder="Enter password"
-              disabled={isPending}
-              type="password"
-              description={
-                <div className="flex justify-end">
-                  <Link href={"/auth/forget-password"} className="hover:underline">Forgot password?</Link>
-                </div>
-              }
-            />
-            <Button type="submit" disabled={isPending}>
-              Login
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-      <CardFooter className="text-sm">
-        <span>
-          Don&apost have account?{" "}
-          <Link className="font-semibold hover:underline" href={"/auth/signup"}>
-            Signup
-          </Link>{" "}
-        </span>
-      </CardFooter>
-    </Card>
+    <Form {...form}>
+      <form
+        onSubmit={onSubmit}
+        className="space-y-4 md:space-x-2"
+        action={formAction}
+        ref={formRef}
+      >
+        <InputControl
+          name="email"
+          label="Email"
+          placeholder="example@gmail.com"
+          disabled={isPending}
+        />
+        <InputControl
+          name="password"
+          label="Password"
+          placeholder="Enter password"
+          disabled={isPending}
+          type="password"
+          description={
+            <span className="flex justify-end">
+              <Link href={"/auth/forget-password"} className="hover:underline">
+                Forgot password?
+              </Link>
+            </span>
+          }
+        />
+        <Button type="submit" disabled={isPending}>
+          Login
+        </Button>
+      </form>
+    </Form>
   );
 };
 
