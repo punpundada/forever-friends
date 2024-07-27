@@ -84,6 +84,7 @@ const SinupForm = () => {
           label="Password"
           placeholder="Enter Password"
           disabled={isPending}
+          type="password"
         />
         <Button type="submit" disabled={isPending}>
           Signup

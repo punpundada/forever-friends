@@ -2,14 +2,25 @@
 
 import { lucia } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { loginSchema, LoginSchemaType, SignupSchema, SignupType } from "@/types/auth";
+import {
+  loginSchema,
+  LoginSchemaType,
+  SignupSchema,
+  SignupType,
+} from "@/types/auth";
 import { cookies } from "next/headers";
 import { hash, verify } from "@node-rs/argon2";
 import { generateIdFromEntropySize } from "lucia";
 import { ZodError } from "zod";
 import { DefaultState } from "@/types/util";
 import { UserType } from "@/types/user";
-import { getErrorResponse } from "@/lib/utils";
+import { emailOtpHTML, getErrorResponse } from "@/lib/utils";
+import {
+  createTransporter,
+  generateEmailVerificationCode,
+} from "./uitilityActions";
+import env from "@/lib/env";
+import { isWithinExpirationDate } from "oslo";
 
 async function getPasswordHash(password: string) {
   const passwordHash = await hash(password, {
@@ -54,10 +65,29 @@ export const saveUser = async (
         password: false,
       },
     });
+    const verificationCode = await generateEmailVerificationCode(
+      savedUser.id,
+      savedUser.email
+    );
+    const transporter = await createTransporter()
+    const emailSend = await transporter.sendMail({
+      from: env.EMAIL_FROM,
+      subject: "Varification OTP",
+      to: savedUser.email,
+      html: emailOtpHTML({
+        name: "Tasks-app",
+        otp: verificationCode,
+        validFor: "15 mins",
+      }),
+    });
 
     const session = await lucia.createSession(savedUser.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes
+    );
 
     return {
       data: undefined,
@@ -65,6 +95,7 @@ export const saveUser = async (
       isSuccess: true,
     };
   } catch (error: any) {
+    console.error(error.message);
     if (error instanceof ZodError) {
       const msg = error.issues.map((x) => x.message).join(",");
       return {
@@ -94,9 +125,14 @@ export interface LoginData {
 }
 
 export const login = async (
-  prevState: DefaultState<LoginSchemaType, Omit<UserType, "password"> | undefined>,
+  prevState: DefaultState<
+    LoginSchemaType,
+    Omit<UserType, "password"> | undefined
+  >,
   data: FormData
-): Promise<DefaultState<LoginSchemaType, Omit<UserType, "password"> | undefined>> => {
+): Promise<
+  DefaultState<LoginSchemaType, Omit<UserType, "password"> | undefined>
+> => {
   const formData = Object.fromEntries(data);
   try {
     const validData = loginSchema.parse(formData);
@@ -118,7 +154,10 @@ export const login = async (
       };
     }
 
-    const isValidPassword = await varifyPassword(foundUser.password, validData.password);
+    const isValidPassword = await varifyPassword(
+      foundUser.password,
+      validData.password
+    );
 
     if (!isValidPassword) {
       return {
@@ -130,11 +169,15 @@ export const login = async (
     }
     const session = await lucia.createSession(foundUser.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes
+    );
 
     const { password, ...rest } = foundUser;
-    console.log('rest',rest);
-    
+    console.log("rest", rest);
+
     return {
       defaultValues: validData,
       response: rest,
@@ -144,8 +187,37 @@ export const login = async (
   } catch (error) {
     return getErrorResponse({
       error,
-      formData: loginSchema.parse(formData) ?? (formData as any),
+      formData: loginSchema.safeParse(formData).data ?? (formData as any),
       schama: loginSchema,
     });
   }
 };
+
+async function verifyVerificationCode(
+  user: UserType,
+  code: string
+): Promise<boolean> {
+  return await prisma.$transaction(async (tx) => {
+    const databaseCode = await tx.email_Verification.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+    if (!databaseCode || databaseCode.code !== code) {
+      return false;
+    }
+    await prisma.email_Verification.delete({
+      where: {
+        id: databaseCode.id,
+      },
+    });
+
+    if (!isWithinExpirationDate(databaseCode.expires_at)) {
+      return false;
+    }
+    if (databaseCode.email !== user.email) {
+      return false;
+    }
+    return true;
+  });
+}

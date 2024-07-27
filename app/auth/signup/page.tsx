@@ -5,10 +5,12 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import SinupForm from "@/components/form/SinupForm";
+import Link from "next/link";
 
 const SignupPage = () => {
   return (
@@ -27,6 +29,9 @@ const SignupPage = () => {
           <CardContent>
             <SinupForm />
           </CardContent>
+          <CardFooter>
+            <span>Already have an account <Link href={'/auth/login'} className="font-semibold hover:underline">Login</Link></span>
+          </CardFooter>
         </Card>
       </div>
     </div>

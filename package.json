@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate": "npx prisma migrate dev",
-    "migrete:c": "npx prisma migrate dev --create-only",
+    "migrate:c": "npx prisma migrate dev --create-only",
     "generate": "npx prisma generate",
     "format": "npx prisma format"
   },
@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "next": "14.2.5",
     "next-themes": "^0.3.0",
+    "nodemailer": "^6.9.14",
     "oslo": "^1.2.1",
     "react": "^18",
     "react-dom": "^18",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/nodemailer": "^6.4.15",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",

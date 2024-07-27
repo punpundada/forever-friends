@@ -16,7 +16,7 @@ interface InputType<T extends FieldValues>
   name: Path<T>;
   label?: string;
   placeholder?: string;
-  description?: string;
+  description?: React.ReactNode;
   disabled?: boolean;
   defaultvalue?: PathValue<T, Path<T>>;
   type?:"text" | "email" | "number" | "password"

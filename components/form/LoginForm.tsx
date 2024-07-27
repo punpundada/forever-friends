@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import {
   Card,
@@ -18,6 +18,7 @@ import { useFormState } from "react-dom";
 import { login } from "@/actions/authActions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 const defaultValues = {
   email: "",
   password: "",
@@ -49,20 +50,20 @@ const LoginForm = () => {
   React.useEffect(() => {
     if (state.isSuccess) {
       router.push("/");
-      toast("Success",{
-        description:state.message,
-        action:<Button variant={'outline'}>Close</Button>
-      })
-    }else{
-      toast("Error",{
-        description:state.message,
-        action:<Button variant={'outline'}>Close</Button>
-      })
+      toast("Success", {
+        description: state.message,
+        action: <Button variant={"outline"}>Close</Button>,
+      });
+    } else {
+      toast("Error", {
+        description: state.message,
+        action: <Button variant={"outline"}>Close</Button>,
+      });
     }
   }, [router, state]);
 
   return (
-    <Card className="w-4/5">
+    <Card className="w-[90%] md:w-[80%]">
       <CardHeader>
         <CardTitle>Login</CardTitle>
         <CardDescription>
@@ -73,7 +74,7 @@ const LoginForm = () => {
         <Form {...form}>
           <form
             onSubmit={onSubmit}
-            className="space-y-4"
+            className="space-y-4 md:space-x-2"
             action={formAction}
             ref={formRef}
           >
@@ -89,6 +90,11 @@ const LoginForm = () => {
               placeholder="Enter password"
               disabled={isPending}
               type="password"
+              description={
+                <div className="flex justify-end">
+                  <Link href={"/auth/forget-password"} className="hover:underline">Forgot password?</Link>
+                </div>
+              }
             />
             <Button type="submit" disabled={isPending}>
               Login
@@ -96,7 +102,14 @@ const LoginForm = () => {
           </form>
         </Form>
       </CardContent>
-      <CardFooter></CardFooter>
+      <CardFooter className="text-sm">
+        <span>
+          Don&apost have account?{" "}
+          <Link className="font-semibold hover:underline" href={"/auth/signup"}>
+            Signup
+          </Link>{" "}
+        </span>
+      </CardFooter>
     </Card>
   );
 };

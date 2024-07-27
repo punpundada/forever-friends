@@ -14,11 +14,13 @@ datasource db {
 }
 
 model User {
-  id       String    @id
-  name     String
-  sessions Session[]
-  email    String    @unique
-  password String
+  id                 String               @id
+  name               String
+  sessions           Session[]
+  email              String               @unique
+  password           String
+  email_verified     Boolean              @default(false)
+  Email_Verification Email_Verification[]
 }
 
 model Session {
@@ -26,4 +28,13 @@ model Session {
   userId    String
   expiresAt DateTime
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
+model Email_Verification {
+  id         Int      @id @default(autoincrement())
+  code       String
+  userId     String   @unique
+  user       User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+  email      String
+  expires_at DateTime
 }
