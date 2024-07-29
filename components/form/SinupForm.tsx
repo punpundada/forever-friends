@@ -16,13 +16,10 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   InputOTP,
@@ -30,13 +27,13 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "../ui/input-otp";
-import { REGEXP_ONLY_DIGITS } from "@/lib/utils";
 
-const defaultValues = {
+const defaultValues:SignupType = {
   email: "",
   id: "",
   name: "",
   password: "",
+  role:"USER"
 };
 
 const SinupForm = () => {
@@ -60,7 +57,7 @@ const SinupForm = () => {
       id: "",
       name: "",
       password: "",
-      ...(state ?? {}),
+      ...(state.data ?? {}),
     },
     resolver: zodResolver(SignupSchema),
     mode: "onChange",

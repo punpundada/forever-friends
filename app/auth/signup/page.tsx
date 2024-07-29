@@ -14,7 +14,7 @@ import Link from "next/link";
 
 const SignupPage = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 h-screen">
+    <div className="grid grid-cols-1 md:grid-cols-2 h-full">
       <div className="hidden md:flex justify-center items-center">
         <Image src={signupImage} height={400} width={400} alt="Login Image" />
       </div>

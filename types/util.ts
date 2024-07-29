@@ -4,3 +4,9 @@ export type DefaultState<T, K> = {
   message: string;
   isSuccess: boolean;
 };
+
+
+export type Option={
+  value:string
+  label:string
+}

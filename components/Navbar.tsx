@@ -18,13 +18,13 @@ const kalam = Kalam({ subsets: ["latin"], weight: "700" });
 const Navbar = async () => {
   const user = await getUser();
   return (
-    <div className="flex justify-between px-4 items-center">
-      <NavigationMenu className="h-[10%] p-4 w-full">
+    <div className="h-12 flex justify-between px-4 items-center">
+      <NavigationMenu className=" p-4 w-full">
         <NavigationMenuList>
           <NavigationMenuItem>
             <NavigationMenuTrigger>Explore</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] grid-cols-1 md:grid-cols-[.75fr_1fr]">
                 <li className="row-span-2">
                   <NavigationMenuLink asChild>
                     <Link
@@ -51,7 +51,7 @@ const Navbar = async () => {
           <NavigationMenuItem>
             <NavigationMenuTrigger>About Us</NavigationMenuTrigger>
             <NavigationMenuContent className="w-full">
-              <ul className="grid gap-3 w-[80vw] p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              <ul className="grid gap-3 w-[80vw] p-4 md:w-[400px] lg:w-[500px] grid-cols-1 md:grid-cols-2">
                 <ListItem href="/about" title="Our Mission">
                   Learn about our mission and values.
                 </ListItem>
@@ -68,7 +68,7 @@ const Navbar = async () => {
           <NavigationMenuItem>
             <NavigationMenuTrigger>Adopt</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-3 w-[80vw] p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              <ul className="grid gap-3 w-[80vw] p-4 md:w-[400px] lg:w-[500px] grid-cols-1 md:grid-cols-2">
                 <ListItem href="/adopt" title="Available Pets">
                   Browse pets available for adoption.
                 </ListItem>
@@ -85,7 +85,7 @@ const Navbar = async () => {
           <NavigationMenuItem>
             <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-3 w-[80vw] p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+              <ul className="grid gap-3 w-[80vw] p-4 md:w-[400px] lg:w-[500px] grid-cols-1 md:grid-cols-2">
                 <ListItem href="/blog" title="Blog">
                   Read our latest articles and updates.
                 </ListItem>
@@ -99,7 +99,7 @@ const Navbar = async () => {
             </NavigationMenuContent>
           </NavigationMenuItem>
           {user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
-            <NavigationMenuItem> w-[80vw]
+            <NavigationMenuItem>
               <Link href="/dashboard" legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   Dashboard

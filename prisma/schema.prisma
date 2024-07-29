@@ -51,6 +51,8 @@ model Session {
   userId    String
   expiresAt DateTime
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+
+  @@map("sessios")
 }
 
 model Email_Verification {
@@ -60,6 +62,8 @@ model Email_Verification {
   user       User     @relation(references: [id], fields: [userId], onDelete: Cascade)
   email      String
   expires_at DateTime
+
+  @@map("email_verification")
 }
 
 enum Role {
@@ -72,8 +76,12 @@ enum Role {
 model AdoptionCenter {
   id          Int    @id @default(autoincrement())
   name        String
-  address     String
-  phoneNumber String
+  landmark    String?
+  pincode     Int
+  street      String
+  state       String
+  country     String
+  phoneNumber String @map("phone_number")
   email       String
   users       User[]
   pets        Pet[]
