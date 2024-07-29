@@ -3,6 +3,8 @@ import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/Navbar";
+import bgImage from "@/assets/caleb-carl-y48cp69VSZo-unsplash.jpg";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -23,13 +25,22 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "h-screen bg-background font-sans antialiased",
           fontSans.variable
         )}
       >
-        <main>
-        {children}
-        </main>
+        {/* <div
+          style={{
+            backgroundImage: `url(${bgImage.src})`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            filter: "blur(1px)",
+          }}
+          className="absolute h-full w-full -z-10"
+        ></div> */}
+        <Navbar />
+        <main className="h-[90%]">{children}</main>
         <Toaster />
       </body>
     </html>

@@ -1,5 +1,6 @@
 import z from "zod";
 import emailSchema from "./emailSchema";
+import { RoleEnum } from "./user";
 
 export const loginSchema = z.object({
   email: emailSchema,
@@ -21,6 +22,7 @@ export const SignupSchema = z.object({
     .string({ required_error: "Password is required" })
     .trim()
     .min(6, "Password must be more than 6 char"),
+    role: RoleEnum.optional().default("USER"),
 });
 
 export type SignupType = z.infer<typeof SignupSchema>

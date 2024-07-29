@@ -21,6 +21,29 @@ model User {
   password           String
   email_verified     Boolean              @default(false)
   Email_Verification Email_Verification[]
+  Profile            Profile?
+  role               Role
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Pet                Pet[]
+  AdoptionCenter     AdoptionCenter[]
+  adoptionCenterId   Int?
+  Adoption           Adoption[]
+
+  @@map("users")
+}
+
+model Profile {
+  id       Int
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String  @unique
+  address  String?
+  phone    String?
+  bio      String?
+  imageUrl String?
+
+  @@id([id, userId])
+  @@map("user_profiles")
 }
 
 model Session {
@@ -37,4 +60,62 @@ model Email_Verification {
   user       User     @relation(references: [id], fields: [userId], onDelete: Cascade)
   email      String
   expires_at DateTime
+}
+
+enum Role {
+  ADMIN
+  USER
+  SUPER_ADMIN
+  EMPLOYEE
+}
+
+model AdoptionCenter {
+  id          Int    @id @default(autoincrement())
+  name        String
+  address     String
+  phoneNumber String
+  email       String
+  users       User[]
+  pets        Pet[]
+
+  @@map("adoption_centers")
+}
+
+model Adoption {
+  id        Int            @id @default(autoincrement())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  petId     Int
+  pet       Pet            @relation(fields: [petId], references: [id])
+  status    AdoptionStatus
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("adoptions")
+}
+
+enum AdoptionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Pet {
+  id               Int            @id @default(autoincrement())
+  name             String
+  age              Int
+  breed            String
+  description      String
+  imageUrl         String[]
+  location         String
+  available        Boolean        @default(true)
+  adoptionCenterId Int
+  adoptionCenter   AdoptionCenter @relation(fields: [adoptionCenterId], references: [id])
+  adoptions        Adoption[]
+  User             User?          @relation(fields: [userId], references: [id])
+  userId           String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@map("pets")
 }

@@ -33,6 +33,7 @@ export const updateUser = React.cache(async (userId:string,user:Omit<UserType,"p
       email:user.email,
       email_verified:user.email_verified,
       name:user.name,
+      role:user.role,
     }
   })
 })
