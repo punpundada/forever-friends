@@ -3,6 +3,7 @@ export type DefaultState<T, K> = {
   response: K | undefined;
   message: string;
   isSuccess: boolean;
+  isCalled?:boolean
 };
 
 

@@ -5,7 +5,8 @@ import LoginForm from "@/components/form/LoginForm";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
-const LoginPage = () => {
+const LoginPage = async() => {
+
   return (
     <div className="grid grid-cols-1  md:grid-cols-2 h-screen p-6">
       <div className="justify-center items-center hidden md:flex">

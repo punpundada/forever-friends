@@ -42,7 +42,7 @@ export default  function RootLayout({
         ></div> */}
         <Navbar />
         <main className="h-[calc(100vh-3rem)]">{children}</main>
-        <Toaster />
+        <Toaster  />
       </body>
     </html>
   );

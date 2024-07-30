@@ -24,7 +24,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import LogOutButton from "./LogOutButton";
-
+/*
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="dtaesvyis"
+NEXT_PUBLIC_CLOUDINARY_API_KEY="324414194418576"
+CLOUDINARY_API_SECRET="xY5BVB4GMGGza4sgd-4QBTrdDac"
+*/
 const kalam = Kalam({ subsets: ["latin"], weight: "700" });
 const Navbar = async () => {
   const data = await getUserProfile();
@@ -130,7 +134,9 @@ const Navbar = async () => {
                 src={data?.profile?.imageUrl ?? ""}
                 alt={`@${data?.user.name}`}
               />
-              <AvatarFallback className="text-xs">{data?.user?.name ?? "user"}</AvatarFallback>
+              <AvatarFallback className="text-xs">
+                {data?.user?.name ?? "user"}
+              </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-36" align="end">
@@ -139,14 +145,14 @@ const Navbar = async () => {
             {data?.user && (
               <>
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href={"/user/profile"}>Profile</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href={"/user/settings"}>Settings</Link>
                   </DropdownMenuItem>
                   {data?.user.role === "ADMIN" && (
-                    <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link href={"/team"}>Team</Link>
                     </DropdownMenuItem>
                   )}
@@ -155,7 +161,7 @@ const Navbar = async () => {
               </>
             )}
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link href={"/support"}>Support</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>

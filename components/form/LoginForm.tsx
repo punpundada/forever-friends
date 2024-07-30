@@ -46,16 +46,17 @@ const LoginForm = () => {
       router.push("/");
       toast("Success", {
         description: state.message,
-        action: <Button variant={"outline"}>Close</Button>,
       });
-      return 
-    } 
-    if(!state.isSuccess && state.response)
-      toast("Error", {
+      return;
+    }
+    if (!state.isSuccess && state.isCalled)
+      toast.error("Login failed", {
         description: state.message,
-        action: <Button variant={"outline"}>Close</Button>,
+        action: {
+          label: "Close",
+          onClick: () => console.log(),
+        },
       });
-    
   }, [router, state]);
 
   return (

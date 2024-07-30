@@ -29,6 +29,7 @@ export function getErrorResponse<T, K>({
       message: msg,
       isSuccess: false,
       response: undefined,
+      isCalled:true,
     };
   }
 
@@ -41,6 +42,7 @@ export function getErrorResponse<T, K>({
       message: uniqueFalureMsg ?? "Unique constraint failed",
       isSuccess: false,
       response: undefined,
+      isCalled:true,
     };
   }
   return {
@@ -48,6 +50,7 @@ export function getErrorResponse<T, K>({
     message: "Someting went wrong",
     isSuccess: false,
     response: undefined,
+    isCalled:true,
   };
 }
 

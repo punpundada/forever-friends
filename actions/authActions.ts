@@ -138,6 +138,7 @@ export const login = React.cache(
           defaultValues: validData,
           isSuccess: false,
           message: "Either Email or password is wrong",
+          isCalled: true,
         };
       }
 
@@ -152,6 +153,7 @@ export const login = React.cache(
           defaultValues: validData,
           isSuccess: false,
           message: "Either Email or password is wrong",
+          isCalled: true,
         };
       }
       const session = await lucia.createSession(foundUser.id, {});
@@ -165,6 +167,7 @@ export const login = React.cache(
         response: rest,
         isSuccess: true,
         message: "Login was successful",
+        isCalled: true,
       };
     } catch (error) {
       return getErrorResponse({
