@@ -36,6 +36,7 @@ declare module "lucia" {
     id: string;
     name: string;
     email_verified: boolean;
-    role: "ADMIN" | "USER" | "SUPER_ADMIN" | "EMPLOYEE"
+    role: "ADMIN" | "USER" | "SUPER_ADMIN" | "EMPLOYEE",
+    adoptionCenterId?:number
   }
 }

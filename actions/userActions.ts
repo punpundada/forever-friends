@@ -5,6 +5,7 @@ import { UserType } from "@/types/user";
 import { cookies } from "next/headers";
 import React from "react";
 import { Option } from "@/types/util";
+
 const getUser = React.cache(async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
   if (!sessionId) return null;
@@ -56,20 +57,44 @@ export const getUserRoleUserOptions = React.cache(async (): Promise<Option[]> =>
 
 export default getUser;
 
+export const getUserCount = React.cache(async () => {
+  return prisma.user.count();
+});
 
-
-export const getUserCount = React.cache(async ()=>{
-  return prisma.user.count()
-})
-
-
-export const getUserProfile = React.cache(async ()=>{
+export const getUserProfile = React.cache(async () => {
   const user = await getUser();
-  if(!user) return undefined
+  if (!user) return undefined;
   const pro = await prisma.profile.findUnique({
-    where:{
-      userId:user?.id
+    where: {
+      userId: user?.id,
+    },
+  });
+  return { profile: pro, user } ?? undefined;
+});
+
+export const getUserOptionsByCenterId = React.cache(async (): Promise<Option[]> => {
+  try {
+    const user = await getUser();
+    if (!user || !user?.adoptionCenterId) {
+      return [];
     }
-  })
-  return {profile:pro,user} ?? undefined
-})
+    const users = await prisma.user.findMany({
+      where: {
+        adoptionCenterId: user.adoptionCenterId,
+      },
+      select: {
+        name: true,
+        id: true,
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
+
+    const list = users.map((x) => ({ value: x.id, label: x.name }));
+    return list;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+});

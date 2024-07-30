@@ -67,7 +67,7 @@ const NewAdoptionCenterForm = () => {
         description: state.message,
       });
     }
-  }, [state, toast, router]);
+  }, [state, router]);
 
   return (
     <>

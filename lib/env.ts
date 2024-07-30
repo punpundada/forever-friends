@@ -19,7 +19,8 @@ const envarSchema = z.object({
   SMTP_PASS: z.string({ required_error: "SMTP_PASS is required" }),
   EMAIL_FROM:z.string({required_error:"EMAIL_FROM is required"}),
   SUPER_ADMIN_EMAIL:z.string({required_error:"SUPER_ADMIN_EMAIL is required"}),
-  SUPER_ADMIN_PASSWORD:z.string({required_error:"SUPER_ADMIN_PASSWORD is required"})
+  SUPER_ADMIN_PASSWORD:z.string({required_error:"SUPER_ADMIN_PASSWORD is required"}),
+  BASE_URL:z.string({required_error:"BASE_URL is required"})
 });
 
 try {

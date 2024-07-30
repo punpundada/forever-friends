@@ -1,4 +1,5 @@
 import { getCenterCount } from "@/actions/adoptioCeterActios";
+import { getPetsCount } from "@/actions/petsAction";
 import getUser, { getUserCount } from "@/actions/userActions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +24,8 @@ const DashoardLayout = async ({
     getCenterCount(),
     getUserCount(),
   ]);
+  const petsCount = getPetsCount(user?.adoptionCenterId);
+
   if (!user || user?.role === "USER") {
     redirect("/");
   }
@@ -86,6 +89,33 @@ const DashoardLayout = async ({
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href={"/dashboard/user/list"} className="">
+                          List
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <div className="text-sm py-4 flex justify-between px-3 items-center">
+                <div>
+                  <span className="text-xs block">Rescued pet</span>
+                  <span className="text-center text-lg">{petsCount}</span>
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant={"link"} size={"sm"} className="ms-2">
+                      <DotsVerticalIcon />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-36">
+                    <>
+                     {user?.role !== 'SUPER_ADMIN' && <DropdownMenuItem asChild>
+                        <Link href={"/dashboard/pets/add"}>Add Rescue pet</Link>
+                      </DropdownMenuItem>}
+                      <DropdownMenuItem asChild>
+                        <Link href={"/dashboard/pets/list"} className="">
                           List
                         </Link>
                       </DropdownMenuItem>

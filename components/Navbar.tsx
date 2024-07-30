@@ -12,11 +12,23 @@ import Link from "next/link";
 import { IdCardIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { Kalam } from "next/font/google";
-import getUser from "@/actions/userActions";
+import { getUserProfile } from "@/actions/userActions";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import LogOutButton from "./LogOutButton";
 
 const kalam = Kalam({ subsets: ["latin"], weight: "700" });
 const Navbar = async () => {
-  const user = await getUser();
+  const data = await getUserProfile();
+
   return (
     <div className="h-12 flex justify-between px-4 items-center">
       <NavigationMenu className=" p-4 w-full">
@@ -32,9 +44,7 @@ const Navbar = async () => {
                       href="/"
                     >
                       <IdCardIcon className="h-6 w-6" />
-                      <div className="mb-2 mt-4 text-lg font-medium">
-                        Forever Friends
-                      </div>
+                      <div className="mb-2 mt-4 text-lg font-medium">Forever Friends</div>
                       <p className="text-sm leading-tight text-muted-foreground">
                         Connecting pets with loving homes.
                       </p>
@@ -98,7 +108,7 @@ const Navbar = async () => {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          {user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+          {data?.user && data.user?.role !== "USER" && (
             <NavigationMenuItem>
               <Link href="/dashboard" legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -109,9 +119,52 @@ const Navbar = async () => {
           )}
         </NavigationMenuList>
       </NavigationMenu>
-      <span className={cn("text-3xl tracking-wide", kalam.className)}>
-        Forever Friends
-      </span>
+      <div className="flex gap-4 items-center">
+        <span className={cn("text-3xl tracking-wide", kalam.className)}>
+          Forever Friends
+        </span>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <Avatar>
+              <AvatarImage
+                src={data?.profile?.imageUrl ?? ""}
+                alt={`@${data?.user.name}`}
+              />
+              <AvatarFallback className="text-xs">{data?.user?.name ?? "user"}</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-36" align="end">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {data?.user && (
+              <>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Link href={"/user/profile"}>Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href={"/user/settings"}>Settings</Link>
+                  </DropdownMenuItem>
+                  {data?.user.role === "ADMIN" && (
+                    <DropdownMenuItem>
+                      <Link href={"/team"}>Team</Link>
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+              </>
+            )}
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <Link href={"/support"}>Support</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                {!data?.user ? <Link href={"/auth/login"}>Login</Link> : <LogOutButton />}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 };

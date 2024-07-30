@@ -48,12 +48,14 @@ const LoginForm = () => {
         description: state.message,
         action: <Button variant={"outline"}>Close</Button>,
       });
-    } else {
+      return 
+    } 
+    if(!state.isSuccess && state.response)
       toast("Error", {
         description: state.message,
         action: <Button variant={"outline"}>Close</Button>,
       });
-    }
+    
   }, [router, state]);
 
   return (

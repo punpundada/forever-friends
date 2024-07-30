@@ -2,12 +2,7 @@
 
 import { lucia } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import {
-  loginSchema,
-  LoginSchemaType,
-  SignupSchema,
-  SignupType,
-} from "@/types/auth";
+import { loginSchema, LoginSchemaType, SignupSchema, SignupType } from "@/types/auth";
 import { cookies } from "next/headers";
 import { hash, verify } from "@node-rs/argon2";
 import { generateIdFromEntropySize } from "lucia";
@@ -15,14 +10,13 @@ import { ZodError } from "zod";
 import { DefaultState } from "@/types/util";
 import { UserType } from "@/types/user";
 import { emailOtpHTML, getErrorResponse } from "@/lib/utils";
-import {
-  createTransporter,
-  generateEmailVerificationCode,
-} from "./uitilityActions";
+import { createTransporter, generateEmailVerificationCode } from "./uitilityActions";
 import env from "@/lib/env";
-import { isWithinExpirationDate } from "oslo";
+import { createDate, isWithinExpirationDate, TimeSpan } from "oslo";
 import React from "react";
 import getUser, { updateUser } from "./userActions";
+import { sha256 } from "oslo/crypto";
+import { encodeHex } from "oslo/encoding";
 
 async function getPasswordHash(password: string) {
   const passwordHash = await hash(password, {
@@ -83,11 +77,7 @@ export const saveUser = React.cache(
 
       const session = await lucia.createSession(savedUser.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
+      cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 
       return {
         data: undefined,
@@ -127,14 +117,9 @@ export interface LoginData {
 
 export const login = React.cache(
   async (
-    prevState: DefaultState<
-      LoginSchemaType,
-      Omit<UserType, "password"> | undefined
-    >,
+    prevState: DefaultState<LoginSchemaType, Omit<UserType, "password"> | undefined>,
     data: FormData
-  ): Promise<
-    DefaultState<LoginSchemaType, Omit<UserType, "password"> | undefined>
-  > => {
+  ): Promise<DefaultState<LoginSchemaType, Omit<UserType, "password"> | undefined>> => {
     const formData = Object.fromEntries(data);
     try {
       const validData = loginSchema.parse(formData);
@@ -171,11 +156,7 @@ export const login = React.cache(
       }
       const session = await lucia.createSession(foundUser.id, {});
       const sessionCookie = lucia.createSessionCookie(session.id);
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
+      cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 
       const { password, ...rest } = foundUser;
 
@@ -233,11 +214,7 @@ export const verifyVerificationCode = React.cache(
       lucia.createSession(user.id, {}),
     ]);
     const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
+    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     return true;
   }
 );
@@ -250,10 +227,213 @@ export const logout = React.cache(async () => {
     }
     await lucia.invalidateSession(sessionId);
     const sessionCookie = lucia.createBlankSessionCookie();
-    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes)
+    cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
     return true;
   } catch (error) {
     console.error(error);
     return false;
   }
 });
+
+const generateTokenHash = async (tokenId: string) => {
+  return encodeHex(await sha256(new TextEncoder().encode(tokenId)));
+};
+
+async function createPasswordResetToken(userId: string): Promise<string> {
+  const savedToken = await prisma?.passwordReset?.findFirst({
+    where: { userId },
+    select: {
+      userId: true,
+    },
+  });
+  if (savedToken) {
+    // optionally invalidate all existing tokens
+    await prisma.passwordReset.delete({
+      where: {
+        userId: userId,
+      },
+    });
+  }
+  const tokenId = generateIdFromEntropySize(25); // 40 character
+  const tokenHash = await generateTokenHash(tokenId);
+
+  await prisma.passwordReset.create({
+    data: {
+      token_hash: tokenHash,
+      userId: userId,
+      expiresAt: createDate(new TimeSpan(2, "h")),
+    },
+  });
+  return tokenId;
+}
+
+const restPasswordEmail = (link: string) => {
+  return `
+  
+<!doctype html>
+<html lang="en-US">
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <title>Reset Password Email Template</title>
+    <meta name="description" content="Reset Password Email Template.">
+    <style type="text/css">
+        a:hover {text-decoration: underline !important;}
+    </style>
+</head>
+
+<body marginheight="0" topmargin="0" marginwidth="0" style="margin: 0px; background-color: #f2f3f8;" leftmargin="0">
+    <!--100% body table-->
+    <table cellspacing="0" border="0" cellpadding="0" width="100%" bgcolor="#f2f3f8"
+        style="@import url(https://fonts.googleapis.com/css?family=Rubik:300,400,500,700|Open+Sans:300,400,600,700); font-family: 'Open Sans', sans-serif;">
+        <tr>
+            <td>
+                <table style="background-color: #f2f3f8; max-width:670px;  margin:0 auto;" width="100%" border="0"
+                    align="center" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="height:80px;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">
+                          <a href="https://rakeshmandal.com" title="logo" target="_blank">
+                            <img width="60" src="https://i.ibb.co/hL4XZp2/android-chrome-192x192.png" title="logo" alt="logo">
+                          </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height:20px;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0"
+                                style="max-width:670px;background:#fff; border-radius:3px; text-align:center;-webkit-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);-moz-box-shadow:0 6px 18px 0 rgba(0,0,0,.06);box-shadow:0 6px 18px 0 rgba(0,0,0,.06);">
+                                <tr>
+                                    <td style="height:40px;">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:0 35px;">
+                                        <h1 style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;">You have
+                                            requested to reset your password</h1>
+                                        <span
+                                            style="display:inline-block; vertical-align:middle; margin:29px 0 26px; border-bottom:1px solid #cecece; width:100px;"></span>
+                                        <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
+                                            We cannot simply send you your old password. A unique link to reset your
+                                            password has been generated for you. To reset your password, click the
+                                            following link and follow the instructions.
+                                        </p>
+                                        <a href="${link}"
+                                            style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Reset
+                                            Password</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height:40px;">&nbsp;</td>
+                                </tr>
+                            </table>
+                        </td>
+                    <tr>
+                        <td style="height:20px;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;">
+                            <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>www.rakeshmandal.com</strong></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="height:80px;">&nbsp;</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <!--/100% body table-->
+</body>
+
+</html>
+  `;
+};
+
+export const sendRestPasswordLink = async (email: string) => {
+  console.log(email);
+
+  const user = await prisma.user.findFirst({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) {
+    return false;
+  }
+  const verificationToken = await createPasswordResetToken(user.id);
+  const verificationLink = env.BASE_URL + verificationToken;
+
+  const transporter = await createTransporter();
+  const emailSend = await transporter.sendMail({
+    from: env.EMAIL_FROM,
+    subject: "Varification OTP",
+    to: user.email,
+    html: restPasswordEmail(verificationLink),
+  });
+  if (!emailSend.accepted) {
+    return false;
+  }
+  return true;
+};
+
+export const verifyToken = async (data: {
+  password: string;
+  reEnterPassword: string;
+  token: string;
+}) => {
+  if (data.password !== data.reEnterPassword) {
+    return {
+      isSuccess: false,
+      message: "Password and re-enter password do not match",
+    };
+  }
+  const tokenHash = await generateTokenHash(data.token);
+  const savedToken = await prisma.passwordReset.findFirst({
+    where: {
+      token_hash: tokenHash,
+    },
+  });
+  if (!savedToken) {
+    return {
+      isSuccess: false,
+      message: "Invalid request",
+    };
+  }
+  await prisma.passwordReset.delete({
+    where: {
+      token_hash: savedToken.token_hash,
+    },
+  });
+
+  if (!isWithinExpirationDate(savedToken.expiresAt)) {
+    return {
+      isSuccess: false,
+      message: "Link expired",
+    };
+  }
+
+  await lucia.invalidateUserSessions(savedToken.userId);
+
+  const hashPassword = await getPasswordHash(data.password);
+
+  await prisma.user.update({
+    where: {
+      id: savedToken.userId,
+    },
+    data: {
+      password: hashPassword,
+    },
+  });
+  const session = await lucia.createSession(savedToken.userId, {});
+  const sessionCookie = lucia.createSessionCookie(session.id);
+  cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+  return {
+    isSuccess: true,
+    message: "Password Reset successfully",
+  };
+};
