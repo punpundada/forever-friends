@@ -83,10 +83,10 @@ const Navbar = async () => {
             <NavigationMenuTrigger>Adopt</NavigationMenuTrigger>
             <NavigationMenuContent>
               <ul className="grid gap-3 w-[80vw] p-4 md:w-[400px] lg:w-[500px] grid-cols-1 md:grid-cols-2">
-                <ListItem href="/adopt" title="Available Pets">
+                <ListItem href="/pets/adopt" title="Available Pets">
                   Browse pets available for adoption.
                 </ListItem>
-                <ListItem href="/adoption-process" title="Adoption Process">
+                <ListItem href="/pets/adoption-process" title="Adoption Process">
                   Learn about our adoption process.
                 </ListItem>
                 <ListItem href="/adoption-centers" title="Adoption Centers">

@@ -2,7 +2,7 @@ import z from "zod";
 
 export const petInsertSchema = z.object({
   name: z.string().min(1, "Please enter name"),
-  age: z.number({ required_error: "Please enter age" }).int().nonnegative(),
+  age: z.coerce.number({ required_error: "Please enter age" }).int().nonnegative(),
   breed: z.string().min(1, "Please enter Breed"),
   description: z.string().min(1, "Please enter description of pet"),
   imageUrl: z.array(z.string().url({ message: "Invalid url" })),
@@ -13,9 +13,9 @@ export const petInsertSchema = z.object({
     .int()
     .nonnegative(),
   userId: z.string().optional(),
-  assignedTo:z.string({required_error:"Please select employee to assign"}),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  assignedTo:z.string().nullable().optional(),
+  createdAt: z.date().default(new Date()),
+  updatedAt: z.date().default(new Date()),
 });
 
 export const petSelectSchema = z.object({
@@ -32,7 +32,7 @@ export const petSelectSchema = z.object({
     .int()
     .nonnegative(),
   userId: z.string().optional().nullable(),
-  assignedTo:z.string(),
+  assignedTo:z.string().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

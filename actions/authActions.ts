@@ -142,6 +142,16 @@ export const login = React.cache(
         };
       }
 
+      if (foundUser?.isBanned) {
+        return {
+          response: undefined,
+          defaultValues: validData,
+          isSuccess: false,
+          message: "Either Email or password is wrong",
+          isCalled: true,
+        };
+      }
+
       const isValidPassword = await varifyPassword(
         foundUser.password,
         validData.password

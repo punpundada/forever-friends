@@ -81,6 +81,7 @@ export const getUserOptionsByCenterId = React.cache(async (): Promise<Option[]> 
     const users = await prisma.user.findMany({
       where: {
         adoptionCenterId: user.adoptionCenterId,
+        isBanned:false,
       },
       select: {
         name: true,
@@ -98,3 +99,20 @@ export const getUserOptionsByCenterId = React.cache(async (): Promise<Option[]> 
     return [];
   }
 });
+
+
+export const getEmployeeCount = React.cache(async(adoptionCenterId:number)=>{
+  try {
+    const list = await prisma.user.findMany({
+      where:{
+        adoptionCenterId
+      },
+      select:{
+        id:true
+      }
+    })
+    return list ? list.length : 1
+  } catch (error) {
+    return 1
+  }
+})

@@ -10,6 +10,7 @@ import InputControl from "../form-control/InputControl";
 import TextAreaControl from "../form-control/TextAreaControl";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const defaults: PetInsertType = {
   adoptionCenterId: 0,
@@ -22,21 +23,23 @@ const defaults: PetInsertType = {
   location: "",
   name: "",
   updatedAt: new Date(),
-  assignedTo: "",
+  assignedTo: null,
 };
 
 const NewPetForm = () => {
   const router = useRouter();
   const formRef = React.useRef<HTMLFormElement | null>(null);
+
   const [state, formAction, isPending] = useFormState(savePetData, {
     defaultValues: defaults,
     isSuccess: false,
     message: "",
     response: undefined,
+    isCalled:false
   });
 
   const form = useForm<PetInsertType>({
-    defaultValues: defaults,
+    defaultValues: { ...defaults, ...state.defaultValues },
     resolver: zodResolver(petInsertSchema),
     mode: "onChange",
   });
@@ -47,19 +50,17 @@ const NewPetForm = () => {
       formAction(new FormData(formRef.current!));
     })(e);
   };
-  /*
-  adoptionCenterId: 0,
-  age: 0,
-  available: true,
-  breed: "",
-  createdAt: new Date(),
-  description: "",
-  imageUrl: [],
-  location: "",
-  name: "",
-  updatedAt: new Date(),
-  assignedTo:"",
-*/
+
+  React.useEffect(() => {
+    if (state.isCalled && state.isSuccess && state.message !== '') {
+      toast.success(state.message);
+      form.reset()
+      return;
+    } else {
+      toast.error(state.message);
+    }
+  }, [state.isCalled, toast, router]);
+
   return (
     <>
       <Form {...form}>
@@ -67,6 +68,7 @@ const NewPetForm = () => {
           action={formAction}
           onSubmit={onSubmit}
           className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          ref={formRef}
         >
           <InputControl name="name" label="Pet Name" placeholder="Enter Pet Name" />
           <div className="row-span-2 col-span-2">
@@ -85,11 +87,17 @@ const NewPetForm = () => {
             label="Pet location"
             placeholder="Enter Pet location"
           />
-          <InputControl
+          {/* <InputControl
             name="assignedTo"
             label="Pet assignedTo"
             placeholder="Enter Pet assignedTo"
-          />
+          /> */}
+          {/* <ComboboxControl
+            options={employeeList}
+            name="assignedTo"
+            label="Assigned To"
+            placeholder="Enter Pet assignedTo"
+          /> */}
           <div className="col-span-full space-x-3">
             <Button>Save Details</Button>
             <Button variant={"outline"} type="button" onClick={() => router.back()}>

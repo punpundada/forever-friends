@@ -29,6 +29,7 @@ model User {
   AdoptionCenter     AdoptionCenter[]
   adoptionCenterId   Int?
   Adoption           Adoption[]
+  isBanned           Boolean              @default(false)
 
   @@map("users")
 }
@@ -122,7 +123,7 @@ model Pet {
   adoptions        Adoption[]
   User             User?          @relation(fields: [userId], references: [id])
   userId           String?
-  assignedTo       String
+  assignedTo       String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 

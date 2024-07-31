@@ -1,24 +1,70 @@
 "use server";
-import env from "@/lib/env";
 import prisma from "@/lib/prisma";
-import { UserType } from "@/types/user";
-import React from "react";
+import { revalidatePath } from "next/cache";
 
-// export const createSuperAdmin = React.cache(async () => {
-//     const user:UserType={
-//         email:env.SUPER_ADMIN_EMAIL,
-//         email_verified:true,
-//         id:"super_id",
-//         name:"Super Admin",
-//         password:env.SUPER_ADMIN_PASSWORD,
-//         role:"SUPER_ADMIN"
-//     }
-//     const exist = await prisma.user.findFirst({
-//         where:{
-//             id:user.id
-//         }
-//     })
-//     if(exist){
+export const getUserListByEmail = async (email: string) => {
+  try {
+    if (!email || email.length === 0) {
+      return [];
+    }
+    const useList = prisma.user.findMany({
+      where: {
+        email: {
+          contains: email,
+        },
+        role: {
+          not: "SUPER_ADMIN",
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        adoptionCenterId: true,
+        role: true,
+        isBanned: true,
+      },
+    });
+    return useList;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
 
-//     }
-// })
+export const toggleUserActive = async (
+  path: string,
+  userId: string,
+  isBanned: boolean
+) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isBanned: !isBanned,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (updatedUser) {
+      revalidatePath(path);
+      return {
+        message: !isBanned ? "User Banned Successfully" : "User Activated Successfully",
+        isSuccess: true,
+      };
+    } else {
+      return {
+        message: "Someting went wrong",
+        isSuccess: false,
+      };
+    }
+  } catch (error: any) {
+    return {
+      message: error.message,
+      isSuccess: false,
+    };
+  }
+};

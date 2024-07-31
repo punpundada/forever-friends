@@ -1,6 +1,6 @@
 import { getCenterCount } from "@/actions/adoptioCeterActios";
 import { getPetsCount } from "@/actions/petsAction";
-import getUser, { getUserCount } from "@/actions/userActions";
+import getUser, { getEmployeeCount, getUserCount } from "@/actions/userActions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -24,6 +24,10 @@ const DashoardLayout = async ({
     getCenterCount(),
     getUserCount(),
   ]);
+  let employeeCount = user?.adoptionCenterId ? 1 : 0;
+  if (user?.role === "ADMIN" && user?.adoptionCenterId) {
+    employeeCount = await getEmployeeCount(user?.adoptionCenterId);
+  }
   const petsCount = getPetsCount(user?.adoptionCenterId);
 
   if (!user || user?.role === "USER") {
@@ -36,66 +40,99 @@ const DashoardLayout = async ({
           <div className="flex-grow">
             <div>
               <p className="font-semibold">Overview</p>
-              <div className="text-sm py-4 flex justify-between px-3 items-center">
-                <div>
-                  <span className="text-xs block">Adoption centers</span>
-                  <span className="text-center text-lg">{count}</span>
+              {user?.role === "SUPER_ADMIN" && (
+                <div className="text-sm py-4 flex justify-between px-3 items-center">
+                  <div>
+                    <span className="text-xs block">Adoption centers</span>
+                    <span className="text-center text-lg">{count}</span>
+                  </div>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant={"link"} size={"sm"}>
+                        <DotsVerticalIcon />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-36">
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/adoption-center/list"} className="">
+                            List
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/adoption-center/new"} className="">
+                            New
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
+              )}
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant={"link"} size={"sm"}>
-                      <DotsVerticalIcon />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-36">
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link href={"/dashboard/adoption-center/list"} className="">
-                          List
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={"/dashboard/adoption-center/new"} className="">
-                          New
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              {user?.role === "SUPER_ADMIN" && (
+                <div className="text-sm py-4 flex justify-between px-3 items-center">
+                  <div>
+                    <span className="text-xs block">Users</span>
+                    <span className="text-center text-lg">{userCount}</span>
+                  </div>
 
-              <div className="text-sm py-4 flex justify-between px-3 items-center">
-                <div>
-                  <span className="text-xs block">Users</span>
-                  <span className="text-center text-lg">{userCount}</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant={"link"} size={"sm"} className="ms-2">
+                        <DotsVerticalIcon />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-36">
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/user/create"}>Create New User</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/user/promote"} className="">
+                            Promote / Demote
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/user/list"} className="">
+                            List
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
+              )}
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant={"link"} size={"sm"} className="ms-2">
-                      <DotsVerticalIcon />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-36">
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link href={"/dashboard/user/create"}>Create New User</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={"/dashboard/user/promote"} className="">
-                          Promote
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={"/dashboard/user/list"} className="">
-                          List
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              {user?.role === "ADMIN" && (
+                <div className="text-sm py-4 flex justify-between px-3 items-center">
+                  <div>
+                    <span className="text-xs block">Employee</span>
+                    <span className="text-center text-lg">{employeeCount}</span>
+                  </div>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant={"link"} size={"sm"} className="ms-2">
+                        <DotsVerticalIcon />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-40">
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/user/enroll"}>Enroll Employee</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/user/list"} className="">
+                            List
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
 
               <div className="text-sm py-4 flex justify-between px-3 items-center">
                 <div>
@@ -111,9 +148,11 @@ const DashoardLayout = async ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-36">
                     <>
-                     {user?.role !== 'SUPER_ADMIN' && <DropdownMenuItem asChild>
-                        <Link href={"/dashboard/pets/add"}>Add Rescue pet</Link>
-                      </DropdownMenuItem>}
+                      {user?.role !== "SUPER_ADMIN" && (
+                        <DropdownMenuItem asChild>
+                          <Link href={"/dashboard/pets/add"}>Add Rescue pet</Link>
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem asChild>
                         <Link href={"/dashboard/pets/list"} className="">
                           List

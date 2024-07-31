@@ -22,6 +22,7 @@ export function getErrorResponse<T, K>({
   uniqueFalureMsg,
   schama,
 }: getErrorResponse<T>): DefaultState<T, K> {
+  console.error(error)
   if (error instanceof ZodError) {
     const msg = error.issues.map((x) => x.message).join(",");
     return {
