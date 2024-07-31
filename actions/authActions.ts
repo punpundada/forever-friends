@@ -307,13 +307,6 @@ const restPasswordEmail = (link: string) => {
                         <td style="height:80px;">&nbsp;</td>
                     </tr>
                     <tr>
-                        <td style="text-align:center;">
-                          <a href="https://rakeshmandal.com" title="logo" target="_blank">
-                            <img width="60" src="https://i.ibb.co/hL4XZp2/android-chrome-192x192.png" title="logo" alt="logo">
-                          </a>
-                        </td>
-                    </tr>
-                    <tr>
                         <td style="height:20px;">&nbsp;</td>
                     </tr>
                     <tr>
@@ -349,7 +342,7 @@ const restPasswordEmail = (link: string) => {
                     </tr>
                     <tr>
                         <td style="text-align:center;">
-                            <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>www.rakeshmandal.com</strong></p>
+                            <p style="font-size:14px; color:rgba(69, 80, 86, 0.7411764705882353); line-height:18px; margin:0 0 0;">&copy; <strong>www.forever-friends.com</strong></p>
                         </td>
                     </tr>
                     <tr>
@@ -379,8 +372,9 @@ export const sendRestPasswordLink = async (email: string) => {
     return false;
   }
   const verificationToken = await createPasswordResetToken(user.id);
-  const verificationLink = env.BASE_URL + verificationToken;
-
+  const verificationLink = env.BASE_URL+"/auth/reset-password/" + verificationToken;
+  console.log(verificationLink);
+  
   const transporter = await createTransporter();
   const emailSend = await transporter.sendMail({
     from: env.EMAIL_FROM,

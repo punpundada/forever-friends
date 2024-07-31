@@ -7,10 +7,10 @@ const layout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  const user = await getUser();
-  if (user) {
-    redirect("/");
-  }
+  // const user = await getUser();
+  // if (user) {
+  //   redirect("/");
+  // }
   return children;
 };
 
