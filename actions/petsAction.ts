@@ -33,7 +33,7 @@ export const savePetData = React.cache(
           isSuccess: false,
           message: "Unvarified User",
           response: undefined,
-          isCalled:true,
+          isCalled: true,
         };
       }
       formData.adoptionCenterId = 1 as any;
@@ -51,7 +51,7 @@ export const savePetData = React.cache(
           isSuccess: false,
           message: "Unvarified User",
           response: undefined,
-          isCalled:true,
+          isCalled: true,
         };
       }
       return {
@@ -59,7 +59,7 @@ export const savePetData = React.cache(
         isSuccess: true,
         message: "Pet Details saved successfully",
         response: savedPet,
-        isCalled:true,
+        isCalled: true,
       };
     } catch (error) {
       return getErrorResponse({
@@ -71,21 +71,33 @@ export const savePetData = React.cache(
   }
 );
 
-
 export const getPetCardList = async () => {
   try {
     return await prisma.pet.findMany({
-      select:{
-        id:true,
-        description:true,
-        name:true,
-        imageUrl:true,
-        location:true,
-        adoptionCenterId:true
-      }
-    })
+      select: {
+        id: true,
+        description: true,
+        name: true,
+        imageUrl: true,
+        location: true,
+        adoptionCenterId: true,
+      },
+    });
   } catch (error) {
-    console.error(error)
-    return []
+    console.error(error);
+    return [];
   }
-}
+};
+
+export const getPetById = async (id: number) => {
+  try {
+    const pet = await prisma.pet.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return pet;
+  } catch (error) {
+    return null;
+  }
+};
