@@ -9,12 +9,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                 String               @id
+  id                 String               @id @map("_id")
   name               String
   sessions           Session[]
   email              String               @unique
@@ -26,7 +26,8 @@ model User {
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   Pet                Pet[]
-  AdoptionCenter     AdoptionCenter[]
+  AdoptionCenter     AdoptionCenter[]     @relation(fields: [adoptionCenterIds], references: [id])
+  adoptionCenterIds  Int[]
   adoptionCenterId   Int?
   Adoption           Adoption[]
   isBanned           Boolean              @default(false)
@@ -35,7 +36,7 @@ model User {
 }
 
 model Profile {
-  id       Int
+  id       Int     @id @map("_id")
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   String  @unique
   address  String?
@@ -43,12 +44,11 @@ model Profile {
   bio      String?
   imageUrl String?
 
-  @@id([id, userId])
   @@map("user_profiles")
 }
 
 model Session {
-  id        String   @id
+  id        String   @id @map("_id")
   userId    String
   expiresAt DateTime
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
@@ -57,7 +57,7 @@ model Session {
 }
 
 model Email_Verification {
-  id         Int      @id @default(autoincrement())
+  id         Int      @id @map("_id")
   code       String
   userId     String   @unique
   user       User     @relation(references: [id], fields: [userId], onDelete: Cascade)
@@ -75,23 +75,24 @@ enum Role {
 }
 
 model AdoptionCenter {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @map("_id")
   name        String
   landmark    String?
   pincode     Int
   street      String
   state       String
   country     String
-  phoneNumber String  @map("phone_number")
+  phoneNumber String   @map("phone_number")
   email       String
-  users       User[]
+  users       User[]   @relation(fields: [userIds], references: [id])
+  userIds     String[]
   pets        Pet[]
 
   @@map("adoption_centers")
 }
 
 model Adoption {
-  id        Int            @id @default(autoincrement())
+  id        Int            @id @map("_id")
   userId    String
   user      User           @relation(fields: [userId], references: [id])
   petId     Int
@@ -110,7 +111,7 @@ enum AdoptionStatus {
 }
 
 model Pet {
-  id               Int            @id @default(autoincrement())
+  id               Int            @id @map("_id")
   name             String
   age              Int
   breed            String
@@ -131,6 +132,7 @@ model Pet {
 }
 
 model PasswordReset {
+  id         Int      @id @map("_id")
   token_hash String   @unique
   userId     String   @unique
   expiresAt  DateTime

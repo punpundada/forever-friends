@@ -10,7 +10,8 @@
     "migrate": "npx prisma migrate dev",
     "migrate:c": "npx prisma migrate dev --create-only",
     "generate": "npx prisma generate",
-    "format": "npx prisma format"
+    "format": "npx prisma format",
+    "push":"npx prisma db push"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

@@ -25,6 +25,23 @@ const getUser = React.cache(async () => {
   return user;
 });
 
+export const isAuthenticcated = async () => {
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+  if (!sessionId) return false;
+  const { user, session } = await lucia.validateSession(sessionId);
+  try {
+    if (session && session.fresh) {
+      return true
+    }
+    if (!session) {
+      return false
+    }
+  } catch (err) {
+    return false
+  }
+  return true;
+}
+
 export const updateUser = React.cache(
   async (userId: string, user: Omit<UserType, "password">) => {
     return await prisma.user.update({
